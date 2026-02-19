@@ -3,89 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yiğit Er Gofret | Dev İndirim</title>
+    <title>Muradi SKM</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="container">
-        <h1>YİGİT ER GOFRET</h1>
-        <p>YAŞASIN İNDİRİM KAZANDINIZ</p>
-        
-        <div class="price-container">
-            <span id="old-price">1000TL</span>
-            <span id="new-price">40TL</span>
-        </div>
-
-        <button class="btn" onclick="indirimYap()">İNDİRİMİ KULLAN</button>
-    </div>
-
-    <div id="flash-text">TAZE</div>
-
-    <div id="video-overlay">
-        <video id="secret-video" playsinline>
-            <source src="Gofret.mp4" type="video/mp4">
-        </video>
-    </div>
-
-    <div id="final-text-overlay">
-        <div class="final-message">muradı götten skm</div>
-    </div>
-
-    <audio id="click-sound">
-        <source src="bab-ayak.mp3" type="audio/mpeg">
-    </audio>
-
-    <script>
-        let clickCount = 0;
-
-        function indirimYap() {
-            clickCount++;
-            
-            const oldPrice = document.getElementById('old-price');
-            const newPrice = document.getElementById('new-price');
-            const flashText = document.getElementById('flash-text');
-            const sound = document.getElementById('click-sound');
-            const videoOverlay = document.getElementById('video-overlay');
-            const video = document.getElementById('secret-video');
-            const finalTextOverlay = document.getElementById('final-text-overlay');
-
-            // 1. SES VE VİDEO KONTROLÜ
-            if (clickCount < 5) {
-                sound.currentTime = 0;
-                sound.play();
-            } else {
-                // 5. tıklamada mp3 sesini anında kapat
-                sound.pause();
-                sound.currentTime = 0;
-            }
-
-            // 2. İNDİRİM EFEKTLERİ
-            oldPrice.classList.add('crossed');
-            newPrice.style.display = 'inline-block';
-            flashText.classList.remove('animate-flash');
-            void flashText.offsetWidth; 
-            flashText.classList.add('animate-flash');
-
-            // 3. 5. TIKLAMA OLAYI
-            if (clickCount === 5) {
-                videoOverlay.style.display = 'flex';
-                video.muted = false;
-                video.play();
-
-                // Video bittiğinde yapılacaklar
-                video.onended = function() {
-                    videoOverlay.style.display = 'none';
-                    finalTextOverlay.style.display = 'flex';
-
-                    // 10 saniye sonra sayfayı yenile
-                    setTimeout(function() {
-                        location.reload();
-                    }, 10000);
-                };
-            }
-        }
-    </script>
+    <div class="rgb-text">MURADI SKM</div>
 </body>
 </html>
-
