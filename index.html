@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yiğit Er Gofret</title>
+    <title>Yiğit Er Gofret | Dev İndirim</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,47 +20,71 @@
         <button class="btn" onclick="indirimYap()">İNDİRİMİ KULLAN</button>
     </div>
 
-    <div id="flash-text">TAZE TAZE</div>
+    <div id="flash-text">TAZE</div>
+
+    <div id="video-overlay">
+        <video id="secret-video" playsinline>
+            <source src="gofret.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div id="final-text-overlay">
+        <div class="final-message">muradı götten skm</div>
+    </div>
+
+    <audio id="click-sound">
+        <source src="bab-ayak.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
+        let clickCount = 0;
+
         function indirimYap() {
+            clickCount++;
+            
             const oldPrice = document.getElementById('old-price');
             const newPrice = document.getElementById('new-price');
             const flashText = document.getElementById('flash-text');
+            const sound = document.getElementById('click-sound');
+            const videoOverlay = document.getElementById('video-overlay');
+            const video = document.getElementById('secret-video');
+            const finalTextOverlay = document.getElementById('final-text-overlay');
 
+            // 1. SES VE VİDEO KONTROLÜ
+            if (clickCount < 5) {
+                sound.currentTime = 0;
+                sound.play();
+            } else {
+                // 5. tıklamada mp3 sesini anında kapat
+                sound.pause();
+                sound.currentTime = 0;
+            }
+
+            // 2. İNDİRİM EFEKTLERİ
             oldPrice.classList.add('crossed');
             newPrice.style.display = 'inline-block';
-
-            // Animasyonu her tıklamada sıfırlayıp tekrar oynatır
             flashText.classList.remove('animate-flash');
             void flashText.offsetWidth; 
             flashText.classList.add('animate-flash');
+
+            // 3. 5. TIKLAMA OLAYI
+            if (clickCount === 5) {
+                videoOverlay.style.display = 'flex';
+                video.muted = false;
+                video.play();
+
+                // Video bittiğinde yapılacaklar
+                video.onended = function() {
+                    videoOverlay.style.display = 'none';
+                    finalTextOverlay.style.display = 'flex';
+
+                    // 10 saniye sonra sayfayı yenile
+                    setTimeout(function() {
+                        location.reload();
+                    }, 10000);
+                };
+            }
         }
     </script>
-
 </body>
 </html>
-<audio id="click-sound">
-    <source src="bab-ayak.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-    function indirimYap() {
-        const oldPrice = document.getElementById('old-price');
-        const newPrice = document.getElementById('new-price');
-        const flashText = document.getElementById('flash-text');
-        const sound = document.getElementById('click-sound'); // Sesi seçtik
-
-        // SESİ ÇAL (Sıfır hata için önce başa sarıyoruz sonra çalıyoruz)
-        sound.currentTime = 0;
-        sound.play();
-
-        // Diğer efektler
-        oldPrice.classList.add('crossed');
-        newPrice.style.display = 'inline-block';
-
-        flashText.classList.remove('animate-flash');
-        void flashText.offsetWidth; 
-        flashText.classList.add('animate-flash');
-    }
-</script>
