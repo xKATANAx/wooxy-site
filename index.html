@@ -1,19 +1,66 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wooxy</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yiğit Er Gofret</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>MURADI SKM</h1>
-<p>YİGİT ER BAYİDEN DEV KAMPANYA</p>
-<p>GOFRET 40TL TAZE TAZE</p>
+    <div class="container">
+        <h1>YİGİT ER GOFRET</h1>
+        <p>YAŞASIN İNDİRİM KAZANDINIZ</p>
+        
+        <div class="price-container">
+            <span id="old-price">1000TL</span>
+            <span id="new-price">40TL</span>
+        </div>
+
+        <button class="btn" onclick="indirimYap()">İNDİRİMİ KULLAN</button>
+    </div>
+
+    <div id="flash-text">TAZE TAZE</div>
+
+    <script>
+        function indirimYap() {
+            const oldPrice = document.getElementById('old-price');
+            const newPrice = document.getElementById('new-price');
+            const flashText = document.getElementById('flash-text');
+
+            oldPrice.classList.add('crossed');
+            newPrice.style.display = 'inline-block';
+
+            // Animasyonu her tıklamada sıfırlayıp tekrar oynatır
+            flashText.classList.remove('animate-flash');
+            void flashText.offsetWidth; 
+            flashText.classList.add('animate-flash');
+        }
+    </script>
 
 </body>
 </html>
+<audio id="click-sound">
+    <source src="bab-ayak.mp3" type="audio/mpeg">
+</audio>
 
+<script>
+    function indirimYap() {
+        const oldPrice = document.getElementById('old-price');
+        const newPrice = document.getElementById('new-price');
+        const flashText = document.getElementById('flash-text');
+        const sound = document.getElementById('click-sound'); // Sesi seçtik
 
+        // SESİ ÇAL (Sıfır hata için önce başa sarıyoruz sonra çalıyoruz)
+        sound.currentTime = 0;
+        sound.play();
 
+        // Diğer efektler
+        oldPrice.classList.add('crossed');
+        newPrice.style.display = 'inline-block';
+
+        flashText.classList.remove('animate-flash');
+        void flashText.offsetWidth; 
+        flashText.classList.add('animate-flash');
+    }
+</script>
