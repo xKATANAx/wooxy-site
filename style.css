@@ -1,4 +1,4 @@
-/* Sayfa Genel Ayarları */
+/* Genel Sıfırlama */
 * {
     margin: 0;
     padding: 0;
@@ -12,102 +12,103 @@ body {
     align-items: center;
     overflow: hidden;
     font-family: 'Arial Black', sans-serif;
-    /* RGB Arka Plan Geçişi */
+    /* RGB Arka Plan Akışı */
     background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
     background-size: 400% 400%;
-    animation: rgb-animation 8s ease infinite;
+    animation: rgb-bg 8s ease infinite;
 }
 
-@keyframes rgb-animation {
+@keyframes rgb-bg {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Metin Alanı */
+/* Ana İçerik */
 .container {
     text-align: center;
-    color: #000; /* İstediğin Siyah Yazı */
+    color: #000;
     z-index: 10;
 }
 
-h1 {
-    font-size: 4.5rem;
-    margin-bottom: 5px;
-}
+h1 { font-size: 4.5rem; margin-bottom: 10px; }
+p { font-size: 1.8rem; margin-bottom: 25px; }
 
-p {
-    font-size: 1.8rem;
-    margin-bottom: 30px;
-}
+/* Fiyat Alanı */
+.price-container { font-size: 4rem; margin-bottom: 30px; }
+#old-price.crossed { text-decoration: line-through; color: #333; font-size: 2.5rem; opacity: 0.6; }
+#new-price { display: none; color: #e60000; font-weight: 900; margin-left: 15px; }
 
-/* Fiyat Bölümü */
-.price-container {
-    font-size: 4rem;
-    margin-bottom: 30px;
-}
-
-#old-price {
-    transition: all 0.4s ease;
-}
-
-/* Butona basınca üstü çizilen hal */
-#old-price.crossed {
-    text-decoration: line-through;
-    color: #444;
-    font-size: 2.5rem;
-    margin-right: 15px;
-}
-
-#new-price {
-    display: none; /* Başlangıçta gizli */
-    color: #e60000;
-    font-weight: 900;
-}
-
-/* Tıklama Animasyonlu Buton */
+/* Buton ve Tıklama Efekti */
 .btn {
     background: #000;
     color: #fff;
     padding: 20px 50px;
     font-size: 1.5rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     font-weight: bold;
     transition: transform 0.1s;
 }
 
-.btn:active {
-    transform: scale(0.9); /* Basılma hissi */
-}
+.btn:active { transform: scale(0.9); }
 
-/* Taze Taze Yazısı Animasyonu */
+/* Taze Taze Fırlama Animasyonu */
 #flash-text {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 8vw;
+    font-size: 9vw;
     color: white;
-    text-shadow: 0 0 30px rgba(0,0,0,0.7);
+    text-shadow: 0 0 30px rgba(0,0,0,0.8);
     pointer-events: none;
     z-index: 100;
     opacity: 0;
 }
 
-.animate-flash {
-    animation: firlat 1.2s ease-out forwards;
-}
+.animate-flash { animation: flash-anim 1.2s ease-out forwards; }
 
-@keyframes firlat {
-    0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
-    20% { opacity: 1; }
+@keyframes flash-anim {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
 }
-/* Tıklandığında butonun parlaması için */
-.btn:active {
-    transform: scale(0.9);
-    background: #ffcc00; /* Tıklanınca kısa süreli sarı olur */
-    color: #000;
+
+/* Video Katmanı */
+#video-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#secret-video { width: 100%; height: 100%; object-fit: contain; }
+
+/* Final Yazı Katmanı */
+#final-text-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.final-message {
+    color: #ff0000;
+    font-size: 7vw;
+    text-transform: uppercase;
+    text-align: center;
+    animation: shake 0.2s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, -2px); }
+    100% { transform: translate(2px, -2px); }
 }
