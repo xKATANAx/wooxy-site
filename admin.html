@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WOOXY ADMIN CONTROL</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+<script>
+  // Senin Firebase Bilgilerin
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6XlCbPxs6I1jJThZ6OTiaJ-Xssw_mkbA",
+    authDomain: "wooxyproject.firebaseapp.com",
+    databaseURL: "https://wooxyproject-default-rtdb.firebaseio.com/",
+    projectId: "wooxyproject",
+    storageBucket: "wooxyproject.firebasestorage.app",
+    messagingSenderId: "932458468968",
+    appId: "1:932458468968:web:ca0e8230bfae415f3c8ddd",
+    measurementId: "G-VX1QEJZXQW"
+  };
+
+  // Firebase'i Başlat
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
     <style>
         /* --- TEMEL PANEL TASARIMI --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -358,4 +378,5 @@
         setInterval(renderUI, 30000);
     </script>
 </body>
+
 </html>
