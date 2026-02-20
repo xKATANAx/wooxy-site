@@ -1,0 +1,14 @@
+/* Bu kısmı dashboard.css dosyanın en altına ekle veya güncelle */
+.admin-badge-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: none; /* JS ile adminlere özel açılacak */
+}
+
+.cyber-btn {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.6);
+    /* Diğer mevcut cyber-btn kodların... */
+}
