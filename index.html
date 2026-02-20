@@ -115,29 +115,6 @@
         }
 
         function login() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            
-            // ADMIN KONTROLÜ (GERİ GELDİ)
-            if(u === "WOOXY" && p === "ADMİN") {
-                location.href = "admin.html";
-                return;
-            }
-
-            let db = JSON.parse(localStorage.getItem('userDB') || "[]");
-            let bl = JSON.parse(localStorage.getItem('blacklist') || "[]");
-
-            if(bl.includes(u)) return alert("🚫 HESABINIZ BANLANDI!");
-
-            let user = db.find(x => x.name === u && x.pass === p);
-            if(user) {
-                user.lastLogin = new Date().toLocaleString();
-                localStorage.setItem('userDB', JSON.stringify(db));
-                alert("Giriş Başarılı!");
-            } else {
-                alert("Hatalı kullanıcı adı veya şifre!");
-            }
-        }
 
         function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
 
@@ -159,3 +136,4 @@
     </script>
 </body>
 </html>
+
