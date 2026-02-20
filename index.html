@@ -19,6 +19,7 @@
         }
         @keyframes pulse { 0% {scale:1;} 50% {scale:1.05;} 100% {scale:1;} }
         
+        /* MİNİMAL BUTON STİLİ */
         .btn-minimal {
             background: transparent;
             color: #48ff00;
@@ -38,6 +39,7 @@
             box-shadow: 0 0 15px rgba(72, 255, 0, 0.4);
         }
 
+        /* Şifre Sıfırlama Modal */
         #resetModal {
             display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
             background:rgba(0,0,0,0.9); z-index:9998; flex-direction:column; 
@@ -64,7 +66,7 @@
 
     <div id="recoveryDisplayModal">
         <h1 style="color:#ffd215; font-size: 24px;">⚠️ BU KODU KAYDEDİN!</h1>
-        <p style="color:#888; margin-top:10px; font-size: 14px;">Şifrenizi unutursanız bu kodla sıfırlayabilirsiniz.</p>
+        <p style="color:#888; margin-top:10px; font-size: 14px; max-width: 400px;">Şifrenizi unutursanız hesabınızı kurtarmanın tek yolu bu koddur.</p>
         <div id="generatedCode" class="recovery-box"></div>
         <button class="btn-minimal" onclick="location.reload()">Kodu Kaydettim</button>
     </div>
@@ -99,7 +101,12 @@
             if(db.find(x => x.name === u)) return alert("Bu kullanıcı zaten var!");
 
             const code = generateCode();
-            db.push({ name: u, pass: p, recoveryCode: code, regDate: new Date().toLocaleDateString() });
+            const newUser = {
+                name: u, pass: p, recoveryCode: code, 
+                regDate: new Date().toLocaleDateString(), lastLogin: "Henüz Yok"
+            };
+
+            db.push(newUser);
             localStorage.setItem('userDB', JSON.stringify(db));
             localStorage.setItem('count_totalReg', parseInt(localStorage.getItem('count_totalReg') || 0) + 1);
 
@@ -111,9 +118,9 @@
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             
-            // DÜZELTİLEN KISIM: A harfi büyük yapıldı
-            if(u === "WOOXY" && p === "admin123") {
-                location.href = "admin.html"; 
+            // ADMİN GİRİŞİ (Artık küçük "admin.html" sayfasına gider)
+            if(u === "admin" && p === "admin123") {
+                location.href = "admin.html";
                 return;
             }
 
@@ -145,12 +152,10 @@
             if(user) {
                 user.pass = np;
                 localStorage.setItem('userDB', JSON.stringify(db));
-                alert("Şifre güncellendi!");
+                alert("Şifreniz başarıyla güncellendi!");
                 location.reload();
-            } else alert("Hatalı kod veya kullanıcı!");
+            } else alert("Kullanıcı adı veya Kurtarma Kodu hatalı!");
         }
     </script>
 </body>
 </html>
-
-
