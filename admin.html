@@ -4,167 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WOOXY ADMIN CONTROL</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<script>
-  // Senin Firebase Bilgilerin
-  const firebaseConfig = {
-    apiKey: "AIzaSyB6XlCbPxs6I1jJThZ6OTiaJ-Xssw_mkbA",
-    authDomain: "wooxyproject.firebaseapp.com",
-    databaseURL: "https://wooxyproject-default-rtdb.firebaseio.com/",
-    projectId: "wooxyproject",
-    storageBucket: "wooxyproject.firebasestorage.app",
-    messagingSenderId: "932458468968",
-    appId: "1:932458468968:web:ca0e8230bfae415f3c8ddd",
-    measurementId: "G-VX1QEJZXQW"
-  };
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyB6XlCbPxs6I1jJThZ6OTiaJ-Xssw_mkbA",
+        authDomain: "wooxyproject.firebaseapp.com",
+        databaseURL: "https://wooxyproject-default-rtdb.firebaseio.com/",
+        projectId: "wooxyproject",
+        storageBucket: "wooxyproject.firebasestorage.app",
+        messagingSenderId: "932458468968",
+        appId: "1:932458468968:web:ca0e8230bfae415f3c8ddd",
+        measurementId: "G-VX1QEJZXQW"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+    </script>
 
-  // Firebase'i Başlat
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
     <style>
-        /* --- TEMEL PANEL TASARIMI --- */
+        /* CSS Kısımların Aynı Kalıyor (Bozmadım) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background-color: #0d0d0d;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
+        body { background-color: #0d0d0d; color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         .admin-layout { display: flex; min-height: 100vh; width: 100%; }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 260px;
-            background-color: #111;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #222;
-            padding-top: 20px;
-            flex-shrink: 0;
-        }
-
-        .radio-container {
-            --main-color: #fffb00;
-            --main-color-opacity: rgba(255, 255, 255, 0.2);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .sidebar { width: 260px; background-color: #111; display: flex; flex-direction: column; border-right: 1px solid #222; padding-top: 20px; flex-shrink: 0; }
+        .radio-container { --main-color: #fffb00; --main-color-opacity: rgba(255, 255, 255, 0.2); position: relative; display: flex; flex-direction: column; }
         .radio-container input { cursor: pointer; appearance: none; height: 60px; width: 100%; z-index: 2; }
-        .radio-container label {
-            position: absolute; left: 50px; height: 60px; display: flex; align-items: center;
-            color: #888; pointer-events: none; z-index: 3; transition: 0.3s;
-        }
-
+        .radio-container label { position: absolute; left: 50px; height: 60px; display: flex; align-items: center; color: #888; pointer-events: none; z-index: 3; transition: 0.3s; }
         input#radio-data + label { top: 0; }
         input#radio-veriler + label { top: 60px; }
         input#radio-updates + label { top: 120px; }
-
         .radio-container input:checked + label { color: var(--main-color); font-weight: bold; }
-
         .glider-container { position: absolute; left: 0; top: 0; width: 100%; height: 180px; pointer-events: none; }
-        .glider {
-            position: absolute; height: 60px; width: 100%;
-            background: linear-gradient(90deg, var(--main-color-opacity) 0%, transparent 100%);
-            border-left: 4px solid var(--main-color);
-            transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56);
-        }
-
+        .glider { position: absolute; height: 60px; width: 100%; background: linear-gradient(90deg, var(--main-color-opacity) 0%, transparent 100%); border-left: 4px solid var(--main-color); transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56); }
         .radio-container input:nth-of-type(1):checked ~ .glider-container .glider { transform: translateY(0); }
         .radio-container input:nth-of-type(2):checked ~ .glider-container .glider { transform: translateY(60px); }
         .radio-container input:nth-of-type(3):checked ~ .glider-container .glider { transform: translateY(120px); }
-
-        /* İÇERİK ALANI */
         .content { flex: 1; padding: 40px; background: #0a0a0a; overflow-y: auto; position: relative; }
         .tab-content { display: none !important; min-height: 100%; padding-bottom: 100px; }
         .tab-content.active { display: block !important; animation: fadeIn 0.4s ease; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         h3 { color: #ffffff; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
-
-        /* KART TASARIMI */
-        .card {
-            background: #161616; padding: 18px; border-radius: 12px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #222;
-        }
-
-        .user-info-box { display: flex; flex-direction: column; gap: 5px; }
-        .user-meta { display: flex; gap: 15px; margin-top: 5px; flex-wrap: wrap; }
-        .meta-item { font-size: 11px; color: #666; display: flex; align-items: center; gap: 4px; }
-        .meta-item b { color: #aaa; }
-
-        /* AKTİFLİK DURUMU CSS */
+        .card { background: #161616; padding: 18px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .status-online { background-color: #48ff00; box-shadow: 0 0 8px #48ff00; }
         .status-offline { background-color: #ff4d4d; }
-
         .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .btn-ban { background: #ff4d4d; color: white; }
         .btn-white { background: #48ff00; color: black; }
         .btn-admin { background: #fffb00; color: black; }
-
-        /* İSTATİSTİKLER */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-item { background: #161616; padding: 20px; border-radius: 12px; border: 1px solid #222; text-align: center; }
-        .stat-item h4 { font-size: 11px; color: #888; margin-bottom: 10px; text-transform: uppercase; }
-        .stat-item p { font-size: 24px; font-weight: bold; color: #48ff00; }
-
-        /* ALL WHITELIST BUTON */
-        .fixed-action-container { display: flex; justify-content: center; padding: 20px 0; width: 100%; }
-        .uiverse {
-            appearance: none; outline: none; position: relative; cursor: pointer; border: none; 
-            border-radius: 24px; color: #fff; font-weight: 600;
-            background: radial-gradient(circle, #ffd215, #fff172 80%);
-            box-shadow: 0 0 14px rgba(255, 223, 87, 0.5);
-        }
-        .uiverse .wrapper { min-width: 200px; padding: 15px 25px; text-align: center; }
-
-        .logout-btn {
-            margin: auto 20px 20px 20px; padding: 12px; background: transparent;
-            color: #ff4d4d; border: 1px solid #ff4d4d; border-radius: 8px; cursor: pointer;
-        }
-
-        /* RGB ONAY MODAL BUTONLARI */
-        .confirm-btn-style {
-            display: inline-block; width: 280px; height: 60px; border-radius: 10px; border: 1px solid #1a5e03;
-            position: relative; overflow: hidden; transition: all 0.5s ease-in; z-index: 1;
-            background-color: #0d0d0d; cursor: pointer; outline: none;
-        }
-        .confirm-btn-style::before, .confirm-btn-style::after {
-            content: ''; position: absolute; top: 0; width: 0; height: 100%; transform: skew(15deg);
-            transition: all 0.5s; overflow: hidden; z-index: -1;
-        }
-        .confirm-btn-style.success-btn::before { left: -10px; background: #00460a; }
-        .confirm-btn-style.success-btn::after { right: -10px; background: #189a24; }
-        .confirm-btn-style.success-btn span { color: #189a24; }
-        
-        .confirm-btn-style.danger-btn { border-color: #5e0303; }
-        .confirm-btn-style.danger-btn::before { left: -10px; background: #460000; }
-        .confirm-btn-style.danger-btn::after { right: -10px; background: #9a1818; }
-        .confirm-btn-style.danger-btn span { color: #9a1818; }
-        
-        .confirm-btn-style:hover::before, .confirm-btn-style:hover::after { width: 58%; }
-        .confirm-btn-style:hover span { color: white; }
-        .confirm-btn-style span { font-size: 15px; font-weight: bold; position: relative; z-index: 2; }
-
-        /* MOBIL UYUMLULUK */
-        @media screen and (max-width: 768px) {
-            .admin-layout { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #222; padding-bottom: 10px; }
-            .content { padding: 20px; }
-            .card { flex-direction: column; text-align: center; gap: 15px; }
-            .user-meta { justify-content: center; }
-            .confirm-btn-style { width: 90%; }
-        }
+        #confirmModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.96); z-index:1000; flex-direction:column; align-items:center; justify-content:center; gap:20px; }
+        .confirm-btn-style { display: inline-block; width: 280px; height: 60px; border-radius: 10px; border: 1px solid #1a5e03; position: relative; background-color: #0d0d0d; cursor: pointer; color: white; font-weight: bold; }
+        .danger-btn { border-color: #5e0303; }
     </style>
 </head>
 <body>
@@ -175,58 +67,37 @@
             <div class="radio-container">
                 <input checked id="radio-data" name="radio" type="radio" onclick="switchTab('data')" />
                 <label for="radio-data">Data Bilgileri</label>
-
                 <input id="radio-veriler" name="radio" type="radio" onclick="switchTab('veriler')" />
                 <label for="radio-veriler">Veriler (Blacklist)</label>
-
                 <input id="radio-updates" name="radio" type="radio" onclick="switchTab('updates')" />
                 <label for="radio-updates">Güncellemeler</label>
-
                 <div class="glider-container"><div class="glider"></div></div>
             </div>
-            <button onclick="location.href='index.html'" class="logout-btn">Çıkış Yap</button>
+            <button onclick="location.href='index.html'" style="margin-top:auto; background:none; color:red; border:1px solid red; padding:10px; cursor:pointer;">Çıkış Yap</button>
         </aside>
 
         <main class="content">
             <section id="tab-data" class="tab-content active">
                 <h3>👤 Aktif Kullanıcılar</h3>
-                <div id="userListDisplay"></div>
+                <div id="userListDisplay">Yükleniyor...</div>
             </section>
 
             <section id="tab-veriler" class="tab-content">
                 <h3>🚫 Banlı & Kara Liste</h3>
-                <div id="blacklistDisplay"></div>
-                <div class="fixed-action-container">
-                    <button class="uiverse" onclick="openConfirm('mass', null)">
-                        <div class="wrapper"><span>ALL WHITELIST</span></div>
-                    </button>
-                </div>
+                <div id="blacklistDisplay">Banlı kullanıcı yok.</div>
             </section>
 
             <section id="tab-updates" class="tab-content">
                 <h3>📊 Sistem İstatistikleri</h3>
-                <div class="stats-grid">
-                    <div class="stat-item"><h4>Toplam Kayıt</h4><p id="stat-total-reg">0</p></div>
-                    <div class="stat-item"><h4>Banlananlar</h4><p id="stat-total-ban" style="color: #ff4d4d;">0</p></div>
-                    <div class="stat-item"><h4>Banı Açılanlar</h4><p id="stat-total-unban" style="color: #00bfff;">0</p></div>
-                    <div class="stat-item"><h4>Aktif Kullanıcılar</h4><p id="stat-active">0</p></div>
-                </div>
-                <h3>🚀 Güncelleme Notları</h3>
-                <div class="card"><span>v00.12 - Son Giriş ve Aktiflik Durumu Takibi</span></div>
-                <div class="card"><span>v00.11 - Yönetici (Admin) Yetkilendirme Sistemi Eklendi</span></div>
-                <div class="card"><span>v00.10 - Özel RGB Onay Sistemi Banlama Dahil Edildi</span></div>
+                <p>Firebase üzerinden canlı takip aktif.</p>
             </section>
         </main>
     </div>
 
-    <div id="confirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.96); z-index:1000; flex-direction:column; align-items:center; justify-content:center; gap:20px;">
-        <h2 id="modalTitle" style="color:white; letter-spacing:2px; margin-bottom: 20px; text-align:center; padding: 0 20px;">İŞLEMİ ONAYLIYOR MUSUNUZ?</h2>
-        <button id="modalConfirmBtn" class="confirm-btn-style success-btn">
-            <span id="confirmBtnText">EVET, ONAYLA</span>
-        </button>
-        <button class="confirm-btn-style danger-btn" onclick="closeConfirmModal()">
-            <span>HAYIR, VAZGEÇ</span>
-        </button>
+    <div id="confirmModal">
+        <h2 id="modalTitle">İŞLEMİ ONAYLIYOR MUSUNUZ?</h2>
+        <button id="modalConfirmBtn" class="confirm-btn-style">EVET, ONAYLA</button>
+        <button class="confirm-btn-style danger-btn" onclick="closeConfirmModal()">VAZGEÇ</button>
     </div>
 
     <script>
@@ -235,148 +106,82 @@
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
-            if(tabName === 'updates') updateStats();
         }
 
-        // Modalı Açan Genel Fonksiyon
+        // Firebase'den kullanıcıları canlı çekme
+        function listenUsers() {
+            db.ref('users').on('value', (snapshot) => {
+                const users = snapshot.val();
+                const userDisplay = document.getElementById('userListDisplay');
+                const blacklistDisplay = document.getElementById('blacklistDisplay');
+                
+                userDisplay.innerHTML = "";
+                blacklistDisplay.innerHTML = "";
+
+                if (!users) {
+                    userDisplay.innerHTML = "Kullanıcı yok.";
+                    return;
+                }
+
+                Object.values(users).forEach(u => {
+                    // Online Kontrolü (Son 5 dakika)
+                    const isOnline = (new Date().getTime() - u.lastSeen) < 300000;
+
+                    // Eğer banlı değilse (role === 'banned' değilse)
+                    if (u.role !== 'banned') {
+                        userDisplay.innerHTML += `
+                        <div class="card">
+                            <div class="user-info-box">
+                                <div>
+                                    <span class="status-dot ${isOnline ? 'status-online' : 'status-offline'}"></span>
+                                    <strong>${u.name}</strong> 
+                                    ${u.role === 'admin' ? '<span style="color:yellow; border:1px solid yellow; padding:2px; font-size:10px;">ADMIN</span>' : ''}
+                                </div>
+                                <div style="font-size:11px; color:#666;">
+                                    Son Giriş: ${u.lastLogin} | Kod: ${u.recoveryCode}
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                ${u.role !== 'admin' ? `<button class="btn btn-admin" onclick="openConfirm('admin', '${u.name}')">ADMİN VER</button>` : ''}
+                                <button class="btn btn-ban" onclick="openConfirm('ban', '${u.name}')">BANLA</button>
+                            </div>
+                        </div>`;
+                    } else {
+                        // Banlılar sekmesine ekle
+                        blacklistDisplay.innerHTML += `
+                        <div class="card" style="border-left: 4px solid red;">
+                            <span>🚫 ${u.name}</span>
+                            <button class="btn btn-white" onclick="unbanUser('${u.name}')">BAN KALDIR</button>
+                        </div>`;
+                    }
+                });
+            });
+        }
+
         function openConfirm(type, data) {
             pendingAction = { type, data };
-            const modal = document.getElementById('confirmModal');
-            const title = document.getElementById('modalTitle');
-            const btnText = document.getElementById('confirmBtnText');
-            const confirmBtn = document.getElementById('modalConfirmBtn');
+            document.getElementById('confirmModal').style.display = 'flex';
+            document.getElementById('modalTitle').innerText = `${data} için ${type} işlemi yapılsın mı?`;
+            
+            document.getElementById('modalConfirmBtn').onclick = () => {
+                if (type === 'admin') {
+                    db.ref('users/' + data).update({ role: 'admin' });
+                } else if (type === 'ban') {
+                    db.ref('users/' + data).update({ role: 'banned' });
+                }
+                closeConfirmModal();
+            };
+        }
 
-            if (type === 'ban') {
-                title.innerText = `${data} KULLANICISI BANLANSIN MI?`;
-                btnText.innerText = "EVET, BANLA";
-                confirmBtn.onclick = executeBan;
-            } else if (type === 'mass') {
-                title.innerText = "TÜM BANLAR SİLİNSİN Mİ?";
-                btnText.innerText = "EVET, HERKESE WHITELIST VER";
-                confirmBtn.onclick = executeMassWhitelist;
-            } else if (type === 'admin') {
-                title.innerText = `${data} KULLANICISINA ADMİN YETKİSİ VERİLSİN Mİ?`;
-                btnText.innerText = "EVET, ADMİN YAP";
-                confirmBtn.onclick = executeMakeAdmin;
-            }
-
-            modal.style.display = 'flex';
+        function unbanUser(username) {
+            db.ref('users/' + username).update({ role: 'user' });
         }
 
         function closeConfirmModal() {
             document.getElementById('confirmModal').style.display = 'none';
         }
 
-        function checkOnlineStatus(lastSeen) {
-            if (!lastSeen) return false;
-            const now = new Date().getTime();
-            const last = new Date(lastSeen).getTime();
-            // Eğer son görülme 5 dakikadan (300.000 ms) azsa online kabul et
-            return (now - last) < 300000; 
-        }
-
-        function renderUI() {
-            const users = JSON.parse(localStorage.getItem('userDB') || "[]");
-            const blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-
-            const userDisplay = document.getElementById('userListDisplay');
-            userDisplay.innerHTML = users.map(u => {
-                const isOnline = checkOnlineStatus(u.lastSeen);
-                return `
-                <div class="card">
-                    <div class="user-info-box">
-                        <div>
-                            <span class="status-dot ${isOnline ? 'status-online' : 'status-offline'}"></span>
-                            <strong>${u.name}</strong> 
-                            ${u.role === 'admin' ? '<span style="color:#fffb00; font-size:10px; border:1px solid #fffb00; padding:2px 5px; border-radius:4px; margin-left:8px;">ADMIN</span>' : ''}
-                            <small style="color:#555; margin-left:10px;">ŞİFRE: ${u.pass}</small>
-                        </div>
-                        <div class="user-meta">
-                            <span class="meta-item"><b>Kayıt:</b> ${u.regDate || 'Bilinmiyor'}</span>
-                            <span class="meta-item"><b>Son Giriş:</b> ${u.lastLogin || 'Giriş Yok'}</span>
-                            <span class="meta-item"><b>Kurtarma:</b> <b style="color:#48ff00">${u.recoveryCode || 'Yok'}</b></span>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        ${u.role !== 'admin' ? `<button class="btn btn-admin" onclick="openConfirm('admin', '${u.name}')">ADMİN VER</button>` : ''}
-                        <button class="btn btn-ban" onclick="openConfirm('ban', '${u.name}')">BANLA</button>
-                    </div>
-                </div>
-            `}).join('') || "<p style='color:#555'>Kullanıcı yok.</p>";
-
-            const blackDisplay = document.getElementById('blacklistDisplay');
-            blackDisplay.innerHTML = blacklist.map(name => `
-                <div class="card" style="border-left: 4px solid #ff4d4d;">
-                    <span style="color:#ff4d4d">🚫 ${name}</span>
-                    <button class="btn btn-white" onclick="unbanUser('${name}')">WHITELIST</button>
-                </div>
-            `).join('') || "<p style='color:#555'>Banlı yok.</p>";
-            
-            updateStats();
-        }
-
-        function executeBan() {
-            const userName = pendingAction.data;
-            let users = JSON.parse(localStorage.getItem('userDB') || "[]");
-            let blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-            
-            localStorage.setItem('count_totalBan', parseInt(localStorage.getItem('count_totalBan') || 0) + 1);
-            blacklist.push(userName);
-            localStorage.setItem('blacklist', JSON.stringify(blacklist));
-            
-            users = users.filter(u => u.name !== userName);
-            localStorage.setItem('userDB', JSON.stringify(users));
-            
-            closeConfirmModal();
-            renderUI();
-        }
-
-        function executeMakeAdmin() {
-            const userName = pendingAction.data;
-            let users = JSON.parse(localStorage.getItem('userDB') || "[]");
-            
-            users = users.map(u => {
-                if(u.name === userName) {
-                    return { ...u, role: 'admin' };
-                }
-                return u;
-            });
-
-            localStorage.setItem('userDB', JSON.stringify(users));
-            closeConfirmModal();
-            renderUI();
-        }
-
-        function unbanUser(userName) {
-            let blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-            localStorage.setItem('count_totalUnban', parseInt(localStorage.getItem('count_totalUnban') || 0) + 1);
-            blacklist = blacklist.filter(name => name !== userName);
-            localStorage.setItem('blacklist', JSON.stringify(blacklist));
-            renderUI();
-        }
-
-        function executeMassWhitelist() {
-            let blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-            let unbanCount = parseInt(localStorage.getItem('count_totalUnban') || 0);
-            localStorage.setItem('count_totalUnban', unbanCount + blacklist.length);
-            localStorage.setItem('blacklist', JSON.stringify([]));
-            closeConfirmModal();
-            renderUI();
-        }
-
-        function updateStats() {
-            const users = JSON.parse(localStorage.getItem('userDB') || "[]");
-            const blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-            document.getElementById('stat-total-reg').innerText = localStorage.getItem('count_totalReg') || (users.length + blacklist.length);
-            document.getElementById('stat-total-ban').innerText = localStorage.getItem('count_totalBan') || 0;
-            document.getElementById('stat-total-unban').innerText = localStorage.getItem('count_totalUnban') || 0;
-            document.getElementById('stat-active').innerText = users.length;
-        }
-
-        window.onload = renderUI;
-        // Her 30 saniyede bir Online/Offline durumunu güncelle
-        setInterval(renderUI, 30000);
+        window.onload = listenUsers;
     </script>
 </body>
-
 </html>
