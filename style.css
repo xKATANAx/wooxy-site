@@ -1,0 +1,152 @@
+/* --- MEVCUT CSS KURALLARIN (BOZMADAN DEVAM) --- */
+body {
+    background-color: #080808;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px;
+    background-color: #121212;
+    border-radius: 20px;
+    border: 1px solid #222;
+    width: 320px;
+    transition: .3s ease-in-out;
+}
+
+.form:hover { border: 1px solid #fffb00; }
+#heading { text-align: center; margin-bottom: 20px; color: #fff; font-size: 1.5em; font-weight: bold; letter-spacing: 2px; }
+.field { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 12px; background-color: #1a1a1a; border: 1px solid #333; transition: 0.3s; }
+.input-icon { height: 1.2em; width: 1.2em; fill: #fffb00; }
+.input-field { background: none; border: none; outline: none; width: 100%; color: #fff; font-size: 0.9em; }
+.input-field.error-mode::placeholder { color: #ff4d4d; font-weight: bold; font-size: 0.85em; }
+.btn-group { display: flex; gap: 10px; margin-top: 20px; }
+button { cursor: pointer; font-weight: bold; transition: .3s; border-radius: 8px; border: none; padding: 12px; }
+.button1 { flex: 2; background-color: #fffb00; color: #000; }
+.button2 { flex: 1; background-color: #252525; color: white; }
+.button3 { background: none; color: #666; font-size: 0.8em; margin-top: 10px; }
+
+/* --- YENİ DASHBOARD VE BUTON TASARIMI --- */
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    height: 100vh;
+    width: 100%;
+}
+
+.light-button button.bt {
+  position: relative;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  outline: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.light-button button.bt .button-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100px;
+  background-color: #0a0a0a;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 700;
+  transition: 300ms;
+  outline: #0f0f0f 2px solid;
+  outline-offset: 20;
+}
+
+.light-button button.bt .button-holder svg {
+  height: 50px;
+  fill: #fff;
+  transition: 300ms;
+}
+
+.light-button button.bt .light-holder {
+  position: absolute;
+  height: 200px;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.light-button button.bt .light-holder .dot {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #0a0a0a;
+  border-radius: 10px;
+  z-index: 2;
+  transition: 300ms;
+}
+
+.light-button button.bt .light-holder .light {
+  position: absolute;
+  top: 0;
+  width: 200px;
+  height: 200px;
+  clip-path: polygon(50% 0%, 25% 100%, 75% 100%);
+  background: transparent;
+  transition: 300ms;
+}
+
+/* --- DEĞİŞEN RENK AYARLARI (SARI TONLAR) --- */
+
+.light-button button.bt:hover .button-holder svg { 
+    fill: #fffb00; /* Hover yapınca ikon sarı olur */
+}
+
+.light-button button.bt:hover .button-holder { 
+    color: #fffb00; /* Hover yapınca yazı sarı olur */
+    outline: #fffb00 2px solid; 
+    outline-offset: 2px; 
+}
+
+.light-button button.bt:hover .light-holder .dot {
+    background-color: #fffb00; /* Ampul noktası sarı parlar */
+    box-shadow: 0 0 10px #fffb00;
+}
+
+.light-button button.bt:hover .light-holder .light {
+  background: linear-gradient(
+    180deg, 
+    rgba(255, 251, 0, 0.8) 0%,   /* Işık başlangıcı sarı */
+    rgba(255, 251, 0, 0.2) 60%,  /* Ortalar hafif sarı */
+    rgba(255, 255, 255, 0) 100%  /* Sönme efekti */
+  );
+}
+
+.rgb-text {
+    font-size: 2em;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: -20px;
+    animation: rgb-cycle 4s linear infinite;
+}
+
+@keyframes rgb-cycle {
+    0%   { color: #ff0000; text-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+    20%  { color: #ff8000; }
+    40%  { color: #ffff00; }
+    60%  { color: #00ff00; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+    80%  { color: #0000ff; }
+    100% { color: #ff0000; }
+}
