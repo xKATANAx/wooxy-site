@@ -1,0 +1,56 @@
+// admin.html içindeki <script> kısmı
+function renderUI() {
+    db.ref('users').on('value', (snapshot) => {
+        const users = snapshot.val();
+        const userDisplay = document.getElementById('userListDisplay');
+        const blackDisplay = document.getElementById('blacklistDisplay');
+        
+        let totalReg = 0, totalBan = 0, activeCount = 0;
+        userDisplay.innerHTML = ""; blackDisplay.innerHTML = "";
+
+        for (let id in users) {
+            const u = users[id];
+            totalReg++;
+            const isOnline = (Date.now() - u.lastSeen) < 30000;
+            if(isOnline) activeCount++;
+
+            if (u.status === 'banned') {
+                totalBan++;
+                blackDisplay.innerHTML += `
+                <div class="card">
+                    <span>🚫 ${u.name}</span>
+                    <button class="btn btn-white" onclick="unbanUser('${u.name}')">BAN KALDIR</button>
+                </div>`;
+            } else {
+                // Senin Orijinal Kart Tasarımın
+                userDisplay.innerHTML += `
+                <div class="card">
+                    <div class="user-info-box">
+                        <div>
+                            <span class="status-dot ${isOnline ? 'status-online' : 'status-offline'}"></span>
+                            <strong>${u.name}</strong> [${u.role.toUpperCase()}]
+                        </div>
+                        <div class="user-meta">
+                            <span><b>Kayıt:</b> ${u.regDate}</span> | 
+                            <span><b>Kod:</b> ${u.recoveryCode}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-admin" onclick="makeAdmin('${u.name}')">ADMIN YAP</button>
+                        <button class="btn btn-ban" onclick="banUser('${u.name}')">BANLA</button>
+                    </div>
+                </div>`;
+            }
+        }
+        // İstatistiklerin (Senin ID'lerinle)
+        document.getElementById('stat-total-reg').innerText = totalReg;
+        document.getElementById('stat-total-ban').innerText = totalBan;
+        document.getElementById('stat-active').innerText = activeCount;
+    });
+}
+
+function makeAdmin(name) { db.ref('users/' + name).update({ role: 'admin' }); }
+function banUser(name) { db.ref('users/' + name).update({ status: 'banned' }); }
+function unbanUser(name) { db.ref('users/' + name).update({ status: 'active' }); }
+
+window.onload = renderUI;
