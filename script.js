@@ -1,5 +1,5 @@
 // --- GECE/GÜNDÜZ TEMA KONTROLÜ ---
-const themeToggle = document.getElementById('theme-toggle'); // HTML'deki input ID'si ile uyumlu olmalı
+const themeToggle = document.getElementById('theme-toggle');
 if (localStorage.getItem('theme') === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
     if (themeToggle) themeToggle.checked = true;
@@ -17,9 +17,7 @@ if (themeToggle) {
     });
 }
 
-// --- MEVCUT JS KODLARIN (BOZMADAN DEVAM) ---
-
-// Hata gösterme yardımcısı
+// --- HATA GÖSTERME YARDIMCISI ---
 function triggerError(inputId, message) {
     const el = document.getElementById(inputId);
     el.value = ""; 
@@ -32,112 +30,73 @@ function triggerError(inputId, message) {
     };
 }
 
-// Giriş Fonksiyonu
-function login() {
-    const nameInput = document.getElementById('loginUser').value;
-    const passInput = document.getElementById('loginPass').value;
-    
-    // Kara Liste Kontrolü
-    const blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
-    
-    if (blacklist.includes(nameInput)) {
-        // Eğer kullanıcı banlıysa modalı göster
-        document.getElementById('banOverlay').style.display = 'flex';
-        return; // İşlemi durdur
-    }
-
-    // Normal giriş kontrollerin burada devam eder...
-    const users = JSON.parse(localStorage.getItem('userDB') || "[]");
-    const user = users.find(u => u.name === nameInput && u.pass === passInput);
-
-    if (user) {
-        alert("Giriş Başarılı!");
-        // Yönlendirme kodların...
-    } else {
-        alert("Hatalı kullanıcı adı veya şifre!");
-    }
-}
-
-// Kayıt Fonksiyonu
+// --- KAYIT FONKSİYONU (FIREBASE VERSION) ---
 function register() {
-    const userEl = document.getElementById('username');
-    const passEl = document.getElementById('password');
-    const user = userEl.value.trim();
-    const pass = passEl.value.trim();
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
 
+    // Kontroller
     if (user.length < 5) { triggerError("username", "En az 5 karakter!"); return; }
     if (pass.length < 10) { triggerError("password", "En az 10 karakter!"); return; }
     if (!/\d/.test(pass)) { triggerError("password", "En az 1 sayı lazım!"); return; }
-    const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-    if (!specialChars.test(pass)) { triggerError("password", "Özel karakter lazım!"); return; }
+    
+    const recoveryCode = Math.floor(100000 + Math.random() * 900000); // 6 Haneli kod
 
-    let users = JSON.parse(localStorage.getItem('userDB') || "[]");
-    if (users.find(u => u.name === user)) {
-        triggerError("username", "Bu isim alınmış!");
-        return;
-    }
-
-    users.push({
-        name: user,
-        pass: pass,
-        regDate: new Date().toLocaleString('tr-TR'),
-        lastLogin: "Henüz Giriş Yapmadı"
+    // Firebase'de kontrol et ve kaydet
+    db.ref('users/' + user).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            triggerError("username", "Bu isim alınmış!");
+        } else {
+            db.ref('users/' + user).set({
+                name: user,
+                pass: pass,
+                role: 'user',
+                recoveryCode: recoveryCode,
+                regDate: new Date().toLocaleString('tr-TR'),
+                lastLogin: "Henüz Giriş Yapmadı",
+                lastSeen: 0
+            }).then(() => {
+                alert("Kayıt Başarılı! Kurtarma Kodun: " + recoveryCode);
+                location.reload(); // Sayfayı yenile ki giriş ekranına dönsün
+            });
+        }
     });
-
-    localStorage.setItem('userDB', JSON.stringify(users));
-    alert("Kayıt Başarılı!");
 }
-// Giriş anında zamanı kaydet
-const now = new Date();
-const timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
 
-let users = JSON.parse(localStorage.getItem('userDB') || "[]");
-users = users.map(u => {
-    if(u.name === loginUserValue) { // Giriş yapan kullanıcının adıyla eşleşen
-        return { 
-            ...u, 
-            lastLogin: timeString, // Görünen zaman metni
-            lastSeen: new Date().getTime() // Online kontrolü için sayısal değer
-        };
-    }
-    return u;
-});
-localStorage.setItem('userDB', JSON.stringify(users));
-// ... (mevcut kodların devamı)
-
+// --- GİRİŞ FONKSİYONU (FIREBASE VERSION) ---
 function login() {
     const nameInput = document.getElementById('loginUser').value.trim();
     const passInput = document.getElementById('loginPass').value.trim();
 
-    let users = JSON.parse(localStorage.getItem('userDB') || "[]");
-    let blacklist = JSON.parse(localStorage.getItem('blacklist') || "[]");
+    if (!nameInput || !passInput) { alert("Boş alan bırakma!"); return; }
 
-    if (blacklist.includes(nameInput)) {
-        alert("BU HESAP BANLANMIŞTIR!");
-        return;
-    }
+    // Önce banlı mı diye buluttaki 'blacklist'e bak (Eğer blacklist'i de Firebase'e taşıdıysan)
+    // Şimdilik basit tutmak için direkt kullanıcıyı çekiyoruz
+    db.ref('users/' + nameInput).once('value', (snapshot) => {
+        const userData = snapshot.val();
 
-    const user = users.find(u => u.name === nameInput && u.pass === passInput);
+        if (userData) {
+            // Şifre Kontrolü
+            if (userData.pass === passInput) {
+                // Giriş yapanı yerel hafızaya not et (Dashboard'da lazım)
+                localStorage.setItem('currentUser', nameInput);
 
-    if (user) {
-        // --- HATA DÜZELTMESİ: Giriş yapanı kaydet ---
-        localStorage.setItem('currentUser', nameInput); 
-        
-        // Son giriş zamanını güncelle
-        const now = new Date();
-        const timeString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-        
-        let updatedUsers = users.map(u => {
-            if(u.name === nameInput) {
-                return { ...u, lastLogin: timeString, lastSeen: new Date().getTime() };
+                // Zamanları güncelle
+                const now = new Date();
+                const timeString = now.toLocaleString('tr-TR');
+
+                db.ref('users/' + nameInput).update({
+                    lastLogin: timeString,
+                    lastSeen: now.getTime()
+                }).then(() => {
+                    alert("Giriş Başarılı! Hoş geldin " + nameInput);
+                    window.location.href = "dashboard.html";
+                });
+            } else {
+                alert("Şifre yanlış!");
             }
-            return u;
-        });
-        localStorage.setItem('userDB', JSON.stringify(updatedUsers));
-
-        alert("Giriş Başarılı! Hoş geldin " + nameInput);
-        window.location.href = "dashboard.html";
-    } else {
-        alert("Kullanıcı adı veya şifre hatalı!");
-    }
+        } else {
+            alert("Kullanıcı bulunamadı!");
+        }
+    });
 }
