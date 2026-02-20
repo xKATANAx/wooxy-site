@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WOOXY / REGİSTER</title>
+    <title>Zowox - Giriş & Kayıt</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* Kurtarma Modal Tasarımı */
@@ -19,7 +19,7 @@
         }
         @keyframes pulse { 0% {scale:1;} 50% {scale:1.05;} 100% {scale:1;} }
         
-        /* --- MİNİMAL BUTON STİLİ (YENİ) --- */
+        /* MİNİMAL BUTON STİLİ */
         .btn-minimal {
             background: transparent;
             color: #48ff00;
@@ -66,9 +66,8 @@
 
     <div id="recoveryDisplayModal">
         <h1 style="color:#ffd215; font-size: 24px;">⚠️ BU KODU KAYDEDİN!</h1>
-        <p style="color:#888; margin-top:10px; font-size: 14px; max-width: 400px;">Şifrenizi unutursanız hesabınızı kurtarmanın tek yolu bu koddur. Lütfen bir yere not edin.</p>
+        <p style="color:#888; margin-top:10px; font-size: 14px; max-width: 400px;">Şifrenizi unutursanız hesabınızı kurtarmanın tek yolu bu koddur.</p>
         <div id="generatedCode" class="recovery-box"></div>
-        
         <button class="btn-minimal" onclick="location.reload()">Kodu Kaydettim</button>
     </div>
 
@@ -118,6 +117,13 @@
         function login() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
+            
+            // ADMIN KONTROLÜ (GERİ GELDİ)
+            if(u === "WOOXY" && p === "ADMİN") {
+                location.href = "admin.html";
+                return;
+            }
+
             let db = JSON.parse(localStorage.getItem('userDB') || "[]");
             let bl = JSON.parse(localStorage.getItem('blacklist') || "[]");
 
@@ -127,9 +133,10 @@
             if(user) {
                 user.lastLogin = new Date().toLocaleString();
                 localStorage.setItem('userDB', JSON.stringify(db));
-                if(u === "admin") location.href = "admin.html";
-                else alert("Giriş Başarılı!");
-            } else alert("Hatalı bilgiler!");
+                alert("Giriş Başarılı!");
+            } else {
+                alert("Hatalı kullanıcı adı veya şifre!");
+            }
         }
 
         function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
