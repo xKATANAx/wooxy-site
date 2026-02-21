@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zowox - Giriş & Kayıt</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        /* Kurtarma ve Şifre Sıfırlama Modalları */
+        #recoveryDisplayModal, #resetModal {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; 
+            align-items:center; justify-content:center; text-align:center; padding:20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .recovery-box {
+            background:#111; padding:25px; border:2px dashed #48ff00; border-radius:15px;
+            font-size:24px; color:#48ff00; letter-spacing:4px; margin:20px 0;
+            animation: pulse 1.5s infinite; font-family: monospace;
+        }
+        
+        @keyframes pulse { 0% {scale:1;} 50% {scale:1.05;} 100% {scale:1;} }
+        
+        .btn-minimal {
+            background: transparent; color: #48ff00; border: 1px solid #48ff00;
+            padding: 10px 25px; border-radius: 20px; font-size: 13px;
+            font-weight: 600; cursor: pointer; letter-spacing: 1px;
+            transition: all 0.3s ease; text-transform: uppercase; margin-top: 10px;
+        }
+        .btn-minimal:hover { background: #48ff00; color: #000; box-shadow: 0 0 15px rgba(72, 255, 0, 0.4); }
+
+        .reset-container {
+            background: #121212; padding: 30px; border-radius: 15px; border: 1px solid #222;
+            width: 100%; max-width: 400px;
+        }
+
+        .reset-input {
+            width: 100%; padding: 12px; margin: 10px 0; background: #000;
+            border: 1px solid #333; color: white; border-radius: 8px; outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars-wrapper">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+    </div>
+
+    <div id="banOverlay" style="display:none;">
+        <div class="ban-card">
+            <div class="ban-icon">🚫</div>
+            <h2>ERİŞİM ENGELİ</h2>
+            <p>Hesabınız askıya alınmıştır.</p>
+            <button class="btn-close-ban" onclick="location.reload()">KAPAT</button>
+        </div>
+    </div>
+
+    <form class="form" onsubmit="event.preventDefault();">
+        <p id="heading">ZOWOX PANEL</p>
+        <div class="field">
+            <input autocomplete="off" placeholder="Kullanıcı Adı" id="username" class="input-field" type="text">
+        </div>
+        <div class="field">
+            <input placeholder="Şifre" id="password" class="input-field" type="password">
+        </div>
+        <div class="btn-group">
+            <button type="button" class="button1" onclick="handleLogin()">Giriş Yap</button>
+            <button type="button" class="button2" onclick="handleRegister()">Kayıt Ol</button>
+        </div>
+        <button type="button" class="button3" onclick="openResetModal()">Şifremi Unuttum</button>
+    </form>
+
+    <div id="recoveryDisplayModal">
+        <h1 style="color:#ffd215; font-size: 24px;">⚠️ BU KODU KAYDEDİN!</h1>
+        <p style="color: #888; margin-top: 10px;">Şifrenizi unutursanız bu kod gerekecek.</p>
+        <div id="generatedCode" class="recovery-box"></div>
+        <button class="btn-minimal" onclick="location.reload()">Kodu Kaydettim</button>
+    </div>
+
+    <div id="resetModal">
+        <div class="reset-container">
+            <h2 style="color: #fffb00; margin-bottom: 20px;">Şifre Sıfırla</h2>
+            <input type="text" id="resetUser" placeholder="Kullanıcı Adınız" class="reset-input">
+            <input type="text" id="resetCode" placeholder="Kurtarma Kodunuz (ZW-...)" class="reset-input">
+            <input type="password" id="newPass" placeholder="Yeni Şifre" class="reset-input">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-minimal" style="border-color: #ff4d4d; color: #ff4d4d;" onclick="closeResetModal()">İPTAL</button>
+                <button class="btn-minimal" onclick="handleReset()">ŞİFREYİ GÜNCELLE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6XlCbPxs6I1jJThZ6OTiaJ-Xssw_mkbA",
+            authDomain: "wooxyproject.firebaseapp.com",
+            databaseURL: "https://wooxyproject-default-rtdb.firebaseio.com/",
+            projectId: "wooxyproject",
+            storageBucket: "wooxyproject.firebasestorage.app",
+            messagingSenderId: "932458468968",
+            appId: "1:932458468968:web:ca0e8230bfae415f3c8ddd"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function openResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
+        function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
+
+        // KAYIT OLMA
+        function handleRegister() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            if(!user || !pass) { alert("Boş alan bırakmayın!"); return; }
+
+            db.ref('users/' + user).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    alert("Bu kullanıcı adı zaten mevcut!");
+                } else {
+                    const code = "ZW-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+                    db.ref('users/' + user).set({
+                        username: user,
+                        pass: pass, // Database 'pass' olarak ayarlandı
+                        recoveryCode: code,
+                        regDate: new Date().toLocaleString('tr-TR'),
+                        isBanned: false,
+                        role: 'user'
+                    }).then(() => {
+                        document.getElementById('generatedCode').innerText = code;
+                        document.getElementById('recoveryDisplayModal').style.display = 'flex';
+                    });
+                }
+            });
+        }
+
+        // GİRİŞ YAPMA
+        function handleLogin() {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+
+    db.ref('users/' + user).once('value').then((snapshot) => {
+        const data = snapshot.val();
+        if(data && data.pass === pass) {
+            if(data.isBanned) {
+                document.getElementById('banOverlay').style.display = 'flex';
+            } else {
+                // Firebase'deki ismini tarayıcı hafızasına alıyoruz (Sadece kimlik için)
+                localStorage.setItem('currentUser', user); 
+                window.location.href = "dashboard.html";
+            }
+        } else {
+            alert("Kullanıcı adı veya şifre hatalı!");
+        }
+    });
+}
+
+        // ŞİFRE SIFIRLAMA MANTIĞI
+        function handleReset() {
+            const user = document.getElementById('resetUser').value.trim();
+            const code = document.getElementById('resetCode').value.trim();
+            const newPass = document.getElementById('newPass').value.trim();
+
+            if(!user || !code || !newPass) { alert("Tüm alanları doldurun!"); return; }
+
+            db.ref('users/' + user).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if(data && data.recoveryCode === code) {
+                    db.ref('users/' + user).update({
+                        pass: newPass
+                    }).then(() => {
+                        alert("Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.");
+                        location.reload();
+                    });
+                } else {
+                    alert("Kullanıcı adı veya Kurtarma Kodu hatalı!");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+/* --- TEMEL SAYFA DÜZENİ --- */
+body {
+    background-color: #0d0e14;
+    color: white;
+    font-family: 'Consolas', monospace;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.main-header {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fffb00;
+    text-shadow: 0 0 15px rgba(255, 251, 0, 0.3);
+    margin-bottom: 50px;
+    letter-spacing: 2px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* --- KART TASARIMI --- */
+.card {
+    width: 320px;
+    background-color: #1a1b26;
+    border-radius: 10px;
+    border: 1px solid #2d2e3e;
+    transition: 0.4s ease;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.active-card, .card:hover {
+    border-color: #fffb00;
+    box-shadow: 0 0 25px rgba(255, 251, 0, 0.15);
+    transform: translateY(-5px);
+}
+
+.header {
+    background-color: #24233b;
+    padding: 12px;
+    border-bottom: 1px solid #2d2e3e;
+}
+
+.top { display: flex; align-items: center; }
+.circle { padding: 0 5px; }
+.circle2 { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.red { background-color: #ff605c; }
+.yellow { background-color: #ffbd44; }
+.green { background-color: #00ca4e; }
+
+.title2 { color: #a9b1d6; margin: 0; padding-left: 15px; font-size: 13px; }
+.code-container { padding: 15px; }
+
+.area {
+    background-color: #0f111a;
+    border-radius: 6px;
+    padding: 20px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 5px;
+}
+
+.info-row label { color: #565f89; font-weight: bold; min-width: 80px; }
+.info-row span { color: #c0caf5; font-weight: 600; }
+.highlight-green { color: #00ca4e !important; }
+
+/* --- BUTON ALANI VE TASARIMLARI --- */
+.btn-container {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* TERMINATE SESSION BUTONU */
+.terminate-btn {
+    background: #ffffff;
+    color: #000;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 6px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+.terminate-btn:hover {
+    background: #ff605c;
+    color: white;
+    box-shadow: 0 0 20px rgba(255, 96, 92, 0.4);
+}
+
+/* ADMIN COMMAND BUTONU (Uiverse.io) */
+.admin-uiverse-btn {
+    display: none; /* Başlangıçta gizli */
+    position: relative;
+    padding: 10px 20px;
+    border-radius: 7px;
+    border: 1px solid rgb(61, 106, 255);
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 2px;
+    background: transparent;
+    color: #fff;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 0 0 0 transparent;
+    transition: all 0.2s ease-in;
+}
+
+.admin-uiverse-btn:hover {
+    background: rgb(61, 106, 255);
+    box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
+    transition: all 0.2s ease-out;
+}
+
+.admin-uiverse-btn::before {
+    content: '';
+    display: block;
+    width: 0px;
+    height: 86%;
+    position: absolute;
+    top: 7%;
+    left: 0%;
+    opacity: 0;
+    background: #fff;
+    box-shadow: 0 0 50px 30px #fff;
+    transform: skewX(-20deg);
+}
+
+.admin-uiverse-btn:hover::before {
+    animation: sh02 0.5s 0s linear;
+}
+
+@keyframes sh02 {
+    from { opacity: 0; left: 0%; }
+    50% { opacity: 1; }
+    to { opacity: 0; left: 100%; }
+}
+
+.admin-uiverse-btn:active {
+    box-shadow: 0 0 0 0 transparent;
+    transition: box-shadow 0.2s ease-in;
+}

